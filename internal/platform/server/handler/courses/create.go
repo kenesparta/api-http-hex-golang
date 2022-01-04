@@ -2,19 +2,8 @@ package courses
 
 import (
 	mooc "api-http-hex-golang/internal"
-	"api-http-hex-golang/internal/platform/storage/mysql"
-	"database/sql"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
-)
-
-const (
-	dbUser = ""
-	dbPass = ""
-	dbHost = ""
-	dbPort = ""
-	dbName = ""
 )
 
 type createRequest struct {
@@ -23,7 +12,7 @@ type createRequest struct {
 	Duration string `json:"duration" binding:"required"`
 }
 
-func CreateHandler() gin.HandlerFunc {
+func CreateHandler(cr mooc.CourseRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req createRequest
 		if err := c.BindJSON(&req); err != nil {
@@ -32,16 +21,7 @@ func CreateHandler() gin.HandlerFunc {
 		}
 		course := mooc.NewCourse(req.ID, req.Name, req.Duration)
 
-		mysqlURI := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPass, dbHost, dbPort, dbName)
-		db, err := sql.Open("mysql", mysqlURI)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		courseRepository := mysql.NewCourseRepository(db)
-
-		if err := courseRepository.Save(c, course); err != nil {
+		if err := cr.Save(c, course); err != nil {
 			c.JSON(http.StatusInternalServerError, err.Error())
 			return
 		}

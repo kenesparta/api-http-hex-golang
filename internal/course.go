@@ -1,6 +1,11 @@
 package mooc
 
-import "context"
+import (
+	"context"
+	"errors"
+	"fmt"
+	"github.com/google/uuid"
+)
 
 type CourseRepository interface {
 	Save(ctx context.Context, course Course) error
@@ -9,20 +14,43 @@ type CourseRepository interface {
 //go:generate mockery --case=snake --outpkg=storagemocks --output=platform/storage/storagemocks --name=CourseRepository
 
 type Course struct {
-	id       string
+	id       CourseID
 	name     string
 	duration string
 }
 
-func NewCourse(id, name, duration string) Course {
-	return Course{
-		id:       id,
-		name:     name,
-		duration: duration,
-	}
+var ErrInvalidCourseID = errors.New("invalid Course ID")
+
+type CourseID struct {
+	value string
 }
 
-func (c Course) ID() string {
+func NewCourseID(value string) (CourseID, error) {
+	v, err := uuid.Parse(value)
+	if err != nil {
+		return CourseID{}, fmt.Errorf("%w: %s", ErrInvalidCourseID, value)
+	}
+
+	return CourseID{
+		value: v.String(),
+	}, nil
+}
+
+func NewCourse(id, name, duration string) (Course, error) {
+	idNc, err := NewCourseID(id)
+
+	if err != nil {
+		return Course{}, err
+	}
+
+	return Course{
+		id:       idNc,
+		name:     name,
+		duration: duration,
+	}, nil
+}
+
+func (c Course) ID() CourseID {
 	return c.id
 }
 

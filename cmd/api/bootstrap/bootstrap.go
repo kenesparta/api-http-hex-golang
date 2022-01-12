@@ -11,11 +11,11 @@ import (
 const (
 	host   = "localhost"
 	port   = 8080
-	dbUser = ""
-	dbPass = ""
-	dbHost = ""
-	dbPort = ""
-	dbName = ""
+	dbUser = "root"
+	dbPass = "secret-pass"
+	dbHost = "127.0.0.1"
+	dbPort = "3306"
+	dbName = "go_ddd"
 )
 
 func Run() error {

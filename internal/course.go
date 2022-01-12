@@ -25,6 +25,10 @@ type CourseID struct {
 	value string
 }
 
+func (id CourseID) String() string {
+	return id.value
+}
+
 func NewCourseID(value string) (CourseID, error) {
 	v, err := uuid.Parse(value)
 	if err != nil {

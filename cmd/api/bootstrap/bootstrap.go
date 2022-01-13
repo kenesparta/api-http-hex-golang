@@ -3,6 +3,7 @@ package bootstrap
 import (
 	"api-http-hex-golang/internal/platform/server"
 	"api-http-hex-golang/internal/platform/storage/mysql"
+	"context"
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
@@ -27,6 +28,6 @@ func Run() error {
 
 	courseRepository := mysql.NewCourseRepository(db)
 
-	srv := server.New(host, port, courseRepository)
-	return srv.Run()
+	ctx, srv := server.New(context.Background(), host, port, courseRepository)
+	return srv.Run(ctx)
 }
